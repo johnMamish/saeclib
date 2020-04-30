@@ -1,7 +1,7 @@
 # Statically-Allocated Embedded C Container Library
 #### saeclib, prounounced "sake-lib"
 
-##Introduction
+## Introduction
 ---------------------------------------------
 This library contains a few, very basic C containers that can be used in embedded systems where dynamic allocation is undesirable.
 
@@ -12,7 +12,7 @@ Every data structure comes in 3 basic flavors:
 
 These containers will all be in the same `.c/.h` files and will all hopefully have the same tests.
 
-##Available containers
+## Available containers
 ---------------------------------------------
   - [ ] statically allocated array
   - [ ] circular buffer
