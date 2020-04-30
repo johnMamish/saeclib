@@ -2,7 +2,6 @@
 #### saeclib, prounounced "sake-lib"
 
 ## Introduction
----------------------------------------------
 This library contains a few, very basic C containers that can be used in embedded systems where dynamic allocation is undesirable.
 
 Every data structure comes in 3 basic flavors:
@@ -13,14 +12,12 @@ Every data structure comes in 3 basic flavors:
 These containers will all be in the same `.c/.h` files and will all hopefully have the same tests.
 
 ## Available containers
----------------------------------------------
   - [ ] statically allocated array
   - [ ] circular buffer
   - [ ] stack
   - [ ] collection
 
 ## A sprinkling of syntactic aspertame
----------------------------------------------
 One thing that frustrates me about designing the API of this library is this: how can we avoid the syntactic clutter of always having the caller carve out a block (or even 2!) of statically allocated memory and then pass it into container initializers? This is pretty ugly, for instance:
 
 ```C
