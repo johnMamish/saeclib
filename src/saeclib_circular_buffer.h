@@ -17,8 +17,8 @@ typedef struct saeclib_circular_buffer
 
     // Total number of elements that the buffer can hold. Data should have capacity * elt_size bytes
     // alloated to it.
-    int capacity;
-    int elt_size;
+    size_t capacity;
+    size_t elt_size;
 } saeclib_circular_buffer_t;
 
 /**
@@ -38,7 +38,7 @@ typedef struct saeclib_circular_buffer
  * @returns This function should always return SAECLIB_ERROR_NOERROR. If not enough memory is
  *          provided to store any elements, well, then, you get a circular buffer of size 0.
  */
-saeclib_error_e saeclib_circular_buffer_t_init(saeclib_circular_buffer_t* buf,
+saeclib_error_e saeclib_circular_buffer_init(saeclib_circular_buffer_t* buf,
                                                void* bufspace,
                                                size_t bufsize,
                                                size_t eltsize);
@@ -60,13 +60,28 @@ saeclib_error_e saeclib_circular_buffer_t_init(saeclib_circular_buffer_t* buf,
  *     // create a circular buffer that can hold 16 mystruct_t's.
  *     saeclib_circular_buffer_t cb = saeclib_circular_buffer_t_salloc(16, sizeof(mystruct_t));
  */
-#define saeclib_circular_buffer_t_salloc(capacity, elt_size) \
+#define saeclib_circular_buffer_salloc(capacity, elt_size) \
     ({ \
         saeclib_circular_buffer_t scb; \
         static uint8_t space[(capacity) * (elt_size)]; \
-        saeclib_circular_buffer_t_init(&scb, space, (capacity) * (elt_size), (elt_size)); \
+        saeclib_circular_buffer_init(&scb, space, (capacity) * (elt_size), (elt_size)); \
         scb; \
     })
+
+/**
+ * Returns the capacity of the circular buffer
+ */
+size_t saeclib_circular_buffer_capacity(saeclib_circular_buffer_t* buf);
+
+/**
+ * Returns the number of elements currently in the circular buffer
+ */
+size_t saeclib_circular_buffer_size(saeclib_circular_buffer_t* buf);
+
+/**
+ * Returns true if the circular buffer is empty.
+ */
+bool saeclib_circular_buffer_empty(saeclib_circular_buffer_t* buf);
 
 /**
  * Inserts a new item into the buffer at its head.

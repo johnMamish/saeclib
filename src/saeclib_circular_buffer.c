@@ -1,9 +1,9 @@
 #include "saeclib_circular_buffer.h"
 
-saeclib_error_e saeclib_circular_buffer_t_init(saeclib_circular_buffer_t* buf,
-                                               void* bufspace,
-                                               size_t bufsize,
-                                               size_t eltsize)
+saeclib_error_e saeclib_circular_buffer_init(saeclib_circular_buffer_t* buf,
+                                             void* bufspace,
+                                             size_t bufsize,
+                                             size_t eltsize)
 {
     buf->data = (uint8_t*)bufspace;
     buf->head = (buf->tail = 0);
@@ -11,6 +11,28 @@ saeclib_error_e saeclib_circular_buffer_t_init(saeclib_circular_buffer_t* buf,
     buf->elt_size = eltsize;
 
     return SAECLIB_ERROR_NOERROR;
+}
+
+
+size_t saeclib_circular_buffer_capacity(saeclib_circular_buffer_t* buf)
+{
+    return buf->capacity;
+}
+
+
+size_t saeclib_circular_buffer_size(saeclib_circular_buffer_t* buf)
+{
+    if (buf->head >= buf->tail) {
+        return (buf->head - buf->tail);
+    } else {
+        return ((buf->head + buf->capacity) - buf->tail);
+    }
+}
+
+
+bool saeclib_circular_buffer_empty(saeclib_circular_buffer_t* buf)
+{
+    return (saeclib_circular_buffer_size(buf) == 0);
 }
 
 

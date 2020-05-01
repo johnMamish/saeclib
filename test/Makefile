@@ -24,7 +24,7 @@ BUILD_TEST_DIR = build_test
 C_INCLUDES:=
 C_INCLUDES+=-I../src
 
-CFLAGS = -O0 -Werror -Wall -g $(C_INCLUDES)
+CFLAGS = -O0 -Werror -Wall -g $(C_INCLUDES) -std=gnu99
 
 # .o files for all of the individual application code source files
 SOURCE_OBJECTS = $(addprefix $(BUILD_SRC_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
@@ -34,7 +34,6 @@ SOURCE_OBJECTS = $(addprefix $(BUILD_SRC_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
 TESTS = $(addprefix $(BUILD_TEST_DIR)/,$(basename $(TEST_SOURCES)))
 
 all: $(TESTS) $(SOURCE_OBJECTS)
-	@echo "These are my tests: " $(TESTS)
 	@for test in $(TESTS) ; do $$test ; done
 
 $(BUILD_SRC_DIR)/%.o: $(SRC_DIR)/%.c Makefile | $(BUILD_SRC_DIR)
@@ -45,7 +44,6 @@ $(BUILD_SRC_DIR)/%.o: ./%.c Makefile | $(BUILD_SRC_DIR)
 	@$(CC) -c $(CFLAGS) $< -o $@
 
 $(BUILD_TEST_DIR)/%: %.c Makefile $(SOURCE_OBJECTS) | $(BUILD_TEST_DIR)
-	#@echo "These are the source objects: " $(SOURCE_OBJECTS)
 	@$(CC) $(SOURCE_OBJECTS) $(CFLAGS) $(LDFLAGS) $< -o $@
 
 $(BUILD_SRC_DIR):
