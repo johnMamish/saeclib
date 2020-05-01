@@ -129,9 +129,10 @@ void saeclib_circular_buffer_empty_test()
             my_struct_t temp;
             saeclib_error_e err = saeclib_circular_buffer_popone(&scb, &temp);
             TEST_ASSERT_EQUAL_INT(SAECLIB_ERROR_NOERROR, err);
-            TEST_ASSERT_EQUAL_MEMORY(&elements[j], &temp, sizeof(my_struct_t));
         }
     }
+
+    TEST_ASSERT_TRUE(saeclib_circular_buffer_empty(&scb));
 
 #undef NUMEL
 }
@@ -218,56 +219,5 @@ int main(int argc, char** argv)
     RUN_TEST(saeclib_circular_buffer_queue_test);
     RUN_TEST(saeclib_circular_buffer_pushone_popone_test);
     RUN_TEST(saeclib_circular_buffer_overflow_test);
-
-    saeclib_circular_buffer_t scb = saeclib_circular_buffer_salloc(100, sizeof(my_struct_t));
-
-    for (int i = 0; i < 10; i++) {
-        my_struct_t ms = {.x = i, .y = 10 - i};
-        saeclib_error_e err = saeclib_circular_buffer_pushone(&scb, &ms);
-
-        if (err != SAECLIB_ERROR_NOERROR) {
-            printf("unexpected error\n");
-        }
-    }
-
-    for (int i = 0; i < 10; i++) {
-        my_struct_t ms;
-        saeclib_error_e err = saeclib_circular_buffer_popone(&scb, &ms);
-
-        if (err != SAECLIB_ERROR_NOERROR) {
-            printf("unexpected error\n");
-        }
-        if ((ms.x != i) || (ms.y != (10 - i))) {
-            printf("bad values\n");
-        }
-    }
-
-    {
-        my_struct_t ms;
-        saeclib_error_e err = saeclib_circular_buffer_popone(&scb, &ms);
-
-        if (err != SAECLIB_ERROR_UNDERFLOW) {
-            printf("underflow not detected\n");
-        }
-    }
-
-    for (int i = 0; i < 99; i++) {
-        my_struct_t ms = {.x = i, .y = 10 - i};
-        saeclib_error_e err = saeclib_circular_buffer_pushone(&scb, &ms);
-
-        if (err != SAECLIB_ERROR_NOERROR) {
-            printf("unexpected error\n");
-        }
-    }
-
-    {
-        my_struct_t ms = { 0 };
-        saeclib_error_e err = saeclib_circular_buffer_pushone(&scb, &ms);
-
-        if (err != SAECLIB_ERROR_OVERFLOW) {
-            printf("overflow not detected\n");
-        }
-    }
-
-    return 0;
+    return UNITY_END();
 }

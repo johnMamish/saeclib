@@ -16,6 +16,7 @@ BUILD_SRC_DIR = build
 # List of all test sources that need to be run
 TEST_SOURCES:=
 TEST_SOURCES+=saeclib_circular_buffer_test.c
+TEST_SOURCES+=saeclib_u8_circular_buffer_test.c
 
 # build directory for executables that run tests
 BUILD_TEST_DIR = build_test
@@ -34,7 +35,7 @@ SOURCE_OBJECTS = $(addprefix $(BUILD_SRC_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
 TESTS = $(addprefix $(BUILD_TEST_DIR)/,$(basename $(TEST_SOURCES)))
 
 all: $(TESTS) $(SOURCE_OBJECTS)
-	@for test in $(TESTS) ; do $$test ; done
+	@for test in $(TESTS) ; do $$test || true; echo; echo ; done
 
 $(BUILD_SRC_DIR)/%.o: $(SRC_DIR)/%.c Makefile | $(BUILD_SRC_DIR)
 	@$(CC) -c $(CFLAGS) $< -o $@

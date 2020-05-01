@@ -71,17 +71,17 @@ saeclib_error_e saeclib_circular_buffer_init(saeclib_circular_buffer_t* buf,
 /**
  * Returns the capacity of the circular buffer
  */
-size_t saeclib_circular_buffer_capacity(saeclib_circular_buffer_t* buf);
+size_t saeclib_circular_buffer_capacity(const saeclib_circular_buffer_t* buf);
 
 /**
  * Returns the number of elements currently in the circular buffer
  */
-size_t saeclib_circular_buffer_size(saeclib_circular_buffer_t* buf);
+size_t saeclib_circular_buffer_size(const saeclib_circular_buffer_t* buf);
 
 /**
  * Returns true if the circular buffer is empty.
  */
-bool saeclib_circular_buffer_empty(saeclib_circular_buffer_t* buf);
+bool saeclib_circular_buffer_empty(const saeclib_circular_buffer_t* buf);
 
 /**
  * Inserts a new item into the buffer at its head.
@@ -94,7 +94,7 @@ bool saeclib_circular_buffer_empty(saeclib_circular_buffer_t* buf);
  *          saeclib_cicular_buffer_pushone() returns SAECLIB_ERROR_OVERFLOW.
  */
 saeclib_error_e saeclib_circular_buffer_pushone(saeclib_circular_buffer_t* buf,
-                                                void* item);
+                                                const void* item);
 
 /**
  * Inserts several new items into the buffer at its head.
@@ -109,7 +109,7 @@ saeclib_error_e saeclib_circular_buffer_pushone(saeclib_circular_buffer_t* buf,
  *          saeclib_cicular_buffer_pushmany() returns SAECLIB_ERROR_OVERFLOW.
  */
 saeclib_error_e saeclib_circular_buffer_pushmany(saeclib_circular_buffer_t* buf,
-                                                 void* items,
+                                                 const void* items,
                                                  uint32_t numel);
 
 /**
