@@ -2,7 +2,11 @@
 #### saeclib, prounounced "sake-lib"
 
 ## Introduction
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 This library contains a few, very basic C containers that can be used in embedded systems where dynamic allocation is undesirable.
+
+This library is aimed at higher performance cortex-m microcontorllers, or even cortex-a microcontrollers if they're running an RTOS. saeclib tries to avoid anything too performant, but might slip in an unnecessary divide here and there. Don't use this in safety critical or medical grade code.
 
 Every data structure comes in 3 basic flavors:
   - one that holds memory blocks of arbitrary size, but returns pointers to those memory blocks, not values.   (container names have no prefix, for instance `saeclib_circular_buffer_t`).
@@ -13,9 +17,22 @@ These containers will all be in the same `.c/.h` files and will all hopefully ha
 
 ## Available containers
   - [ ] statically allocated array
+    - [ ] variable-size element
+    - [ ] u8
+    - [ ] void*
   - [ ] circular buffer
+    - [ ] variable-size element
+    - [ ] u8
+    - [ ] void*
   - [ ] stack
+    - [ ] variable-size element
+    - [ ] u8
+    - [ ] void*
   - [ ] collection
+    - [ ] variable-size element
+    - [ ] u8
+    - [ ] void*
+
 
 ## A sprinkling of syntactic aspertame
 One thing that frustrates me about designing the API of this library is this: how can we avoid the syntactic clutter of always having the caller carve out a block (or even 2!) of statically allocated memory and then pass it into container initializers? This is pretty ugly, for instance:
