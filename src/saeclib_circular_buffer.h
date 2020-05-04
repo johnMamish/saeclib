@@ -180,10 +180,51 @@ saeclib_error_e saeclib_circular_buffer_disposemany(saeclib_circular_buffer_t* b
 typedef struct saeclib_u8_circular_buffer
 {
     uint8_t* data;
+    int head, tail;
+    size_t capacity;
 } saeclib_u8_circular_buffer_t;
 
 
-typedef struct saeclib_vp_circular_buffer
+saeclib_error_e saeclib_u8_circular_buffer_init(saeclib_u8_circular_buffer_t* buf,
+                                               void* bufspace,
+                                               size_t bufsize);
+
+#define saeclib_u8_circular_buffer_salloc(capacity) \
+    ({ \
+        saeclib_u8_circular_buffer_t scb; \
+        static uint8_t space[(capacity)]; \
+        saeclib_u8_circular_buffer_init(&scb, space, (capacity)); \
+        scb; \
+    })
+
+size_t saeclib_u8_circular_buffer_capacity(const saeclib_u8_circular_buffer_t* buf);
+size_t saeclib_u8_circular_buffer_size(const saeclib_u8_circular_buffer_t* buf);
+bool saeclib_u8_circular_buffer_empty(const saeclib_u8_circular_buffer_t* buf);
+
+saeclib_error_e saeclib_u8_circular_buffer_pushone(saeclib_u8_circular_buffer_t* buf,
+                                                   uint8_t item);
+saeclib_error_e saeclib_u8_circular_buffer_pushmany(saeclib_u8_circular_buffer_t* buf,
+                                                    const uint8_t* items,
+                                                    uint32_t numel);
+
+saeclib_error_e saeclib_u8_circular_buffer_popone(saeclib_u8_circular_buffer_t* buf,
+                                                  uint8_t* item);
+saeclib_error_e saeclib_u8_circular_buffer_popmany(saeclib_u8_circular_buffer_t* buf,
+                                                   uint8_t* items,
+                                                   uint32_t numel);
+
+saeclib_error_e saeclib_u8_circular_buffer_peekone(const saeclib_u8_circular_buffer_t* buf,
+                                                   uint8_t* item);
+saeclib_error_e saeclib_u8_circular_buffer_peekmany(const saeclib_u8_circular_buffer_t* buf,
+                                                    uint8_t* item,
+                                                    uint32_t numel);
+
+saeclib_error_e saeclib_u8_circular_buffer_disposeone(saeclib_u8_circular_buffer_t* buf);
+saeclib_error_e saeclib_u8_circular_buffer_disposemany(saeclib_u8_circular_buffer_t* buf,
+                                                       uint32_t numel);
+
+
+struct saeclib_vp_circular_buffer
 {
     void** data;
 } saeclib_vp_circular_buffer_t;
