@@ -58,7 +58,7 @@ saeclib_error_e saeclib_circular_buffer_init(saeclib_circular_buffer_t* buf,
  * Example usage:
  *
  *     // create a circular buffer that can hold 16 mystruct_t's.
- *     saeclib_circular_buffer_t cb = saeclib_circular_buffer_t_salloc(16, sizeof(mystruct_t));
+ *     saeclib_circular_buffer_t cb = saeclib_circular_buffer_salloc(16, sizeof(mystruct_t));
  */
 #define saeclib_circular_buffer_salloc(capacity, elt_size) \
     ({ \
