@@ -209,6 +209,54 @@ void saeclib_circular_buffer_overflow_test()
 }
 
 
+void saeclib_circular_buffer_pushmany_popone_test()
+{
+#define NUMEL 13
+
+    saeclib_circular_buffer_t scb = saeclib_circular_buffer_salloc(NUMEL, sizeof(my_struct_t));
+
+    my_struct_t elements[] = { {0, 10}, {1, 9}, {2, 8}, {3, 7}, {4, 6}, {5, 5}, {6, 4}, {7, 3}, {8, 2}, {9, 1} };
+
+    for (int i = 0; i < NUMEL; i++) {
+        saeclib_error_e err = saeclib_circular_buffer_pushmany(&scb, elements, 5);
+        TEST_ASSERT_EQUAL_INT(SAECLIB_ERROR_NOERROR, err);
+
+        for (int j = 0; j < 5; j++) {
+            my_struct_t temp;
+            saeclib_error_e err = saeclib_circular_buffer_popone(&scb, &temp);
+            TEST_ASSERT_EQUAL_INT(SAECLIB_ERROR_NOERROR, err);
+            TEST_ASSERT_EQUAL_MEMORY(&elements[j], &temp, sizeof(my_struct_t));
+        }
+    }
+
+#undef NUMEL
+}
+
+
+void saeclib_circular_buffer_pushone_popmany_test()
+{
+#define NUMEL 13
+
+    saeclib_circular_buffer_t scb = saeclib_circular_buffer_salloc(NUMEL, sizeof(my_struct_t));
+
+    my_struct_t elements[] = { {0, 10}, {1, 9}, {2, 8}, {3, 7}, {4, 6}, {5, 5}, {6, 4}, {7, 3}, {8, 2}, {9, 1} };
+
+    for (int i = 0; i < NUMEL; i++) {
+        for (int j = 0; j < 5; j++) {
+            saeclib_error_e err = saeclib_circular_buffer_pushone(&scb, &elements[j]);
+            TEST_ASSERT_EQUAL_INT(SAECLIB_ERROR_NOERROR, err);
+        }
+
+        my_struct_t temp[5];
+        saeclib_error_e err = saeclib_circular_buffer_popmany(&scb, temp, 5);
+        TEST_ASSERT_EQUAL_INT(SAECLIB_ERROR_NOERROR, err);
+        TEST_ASSERT_EQUAL_MEMORY(elements, &temp, sizeof(my_struct_t) * 5);
+    }
+
+#undef NUMEL
+}
+
+
 int main(int argc, char** argv)
 {
     UNITY_BEGIN();
@@ -220,5 +268,7 @@ int main(int argc, char** argv)
     RUN_TEST(saeclib_circular_buffer_queue_test);
     RUN_TEST(saeclib_circular_buffer_pushone_popone_test);
     RUN_TEST(saeclib_circular_buffer_overflow_test);
+    RUN_TEST(saeclib_circular_buffer_pushmany_popone_test);
+    RUN_TEST(saeclib_circular_buffer_pushone_popmany_test);
     return UNITY_END();
 }
