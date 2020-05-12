@@ -17,6 +17,7 @@ BUILD_SRC_DIR = build
 TEST_SOURCES:=
 TEST_SOURCES+=saeclib_circular_buffer_test.c
 TEST_SOURCES+=saeclib_u8_circular_buffer_test.c
+TEST_SOURCES+=saeclib_collection_test.c
 
 # build directory for executables that run tests
 BUILD_TEST_DIR = build_test
