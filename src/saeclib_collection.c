@@ -2,6 +2,37 @@
 
 #include <string.h>
 
+
+/**
+ * Maybe this function should return an error in case of out-of-bounds.
+ */
+static bool get_occupied_bit(saeclib_collection_t* collection, uint32_t slot)
+{
+    uint32_t bitmap_idx = slot / 32;
+    uint32_t bitmap_bitpos = slot % 32;
+    return (collection->occupied_bitmap[bitmap_idx] & (((uint32_t)1) << bitmap_bitpos));
+}
+
+/**
+ * Maybe this function should return an error in case of out-of-bounds.
+ */
+static void set_occupied_bit(saeclib_collection_t* collection, uint32_t slot)
+{
+    uint32_t bitmap_idx = slot / 32;
+    uint32_t bitmap_bitpos = slot % 32;
+    collection->occupied_bitmap[bitmap_idx] |= (((uint32_t)1) << bitmap_bitpos);
+}
+
+/**
+ * Maybe this function should return an error in case of out-of-bounds.
+ */
+static void clear_occupied_bit(saeclib_collection_t* collection, uint32_t slot)
+{
+    uint32_t bitmap_idx = slot / 32;
+    uint32_t bitmap_bitpos = slot % 32;
+    collection->occupied_bitmap[bitmap_idx] &= ~(((uint32_t)1) << bitmap_bitpos);
+}
+
 saeclib_error_e saeclib_collection_init(saeclib_collection_t* collection,
                                         void* bufspace,
                                         size_t bufsize,
@@ -9,40 +40,131 @@ saeclib_error_e saeclib_collection_init(saeclib_collection_t* collection,
                                         saeclib_circular_buffer_t* slots,
                                         uint32_t* bitmap_space)
 {
-    return SAECLIB_ERROR_UNIMPLEMENTED;
+    collection->data = bufspace;
+    collection->capacity = bufsize / eltsize;
+    collection->elt_size = eltsize;
+    collection->slots = slots;
+    collection->occupied_bitmap = bitmap_space;
+
+    // clear bitmap
+    memset(collection->occupied_bitmap, 0, ((collection->capacity - 1) / 32) + 1);
+
+    // fill queue
+    for (int i = 0; i < collection->capacity; i++) {
+        saeclib_circular_buffer_pushone(collection->slots, (uint32_t[]){ i });
+    }
+
+    if ((collection->data == NULL) ||
+        (collection->slots == NULL) ||
+        (collection->occupied_bitmap == NULL)) {
+        return SAECLIB_ERROR_NULL_POINTER;
+    } else if ((saeclib_circular_buffer_capacity(collection->slots) != (collection->capacity + 1)) ||
+               (collection->slots->elt_size != sizeof(uint32_t))) {
+        return SAECLIB_ERROR_BAD_STRUCTURE;
+    } else {
+        return SAECLIB_ERROR_NOERROR;
+    }
 }
 
 
 size_t saeclib_collection_capacity(const saeclib_collection_t* collection)
 {
-    return SAECLIB_ERROR_UNIMPLEMENTED;
+    return collection->capacity;
 }
 
 
 size_t saeclib_collection_size(const saeclib_collection_t* collection)
 {
-    return SAECLIB_ERROR_UNIMPLEMENTED;
+    return collection->capacity - saeclib_circular_buffer_size(collection->slots);
 }
 
 
-saeclib_error_e saeclib_collection_add(saeclib_collection_t* collection,
+saeclib_error_e saeclib_collection_add(saeclib_collection_t* scl,
                                        const void* item,
                                        saeclib_collection_iterator_t* it)
 {
-    return SAECLIB_ERROR_UNIMPLEMENTED;
+    // remove a slot from the queue
+    uint32_t slot;
+    saeclib_error_e queue_err = saeclib_circular_buffer_popone(scl->slots, &slot);
+
+    if (queue_err != SAECLIB_ERROR_NOERROR) {
+        if (queue_err == SAECLIB_ERROR_UNDERFLOW) {
+            return SAECLIB_ERROR_OVERFLOW;
+        } else {
+            return SAECLIB_ERROR_UNKNOWN;
+        }
+    }
+
+    // enforce internal bitmask invariant
+    if (get_occupied_bit(scl, slot)) {
+        return SAECLIB_ERROR_UNKNOWN;
+    }
+    set_occupied_bit(scl, slot);
+
+    // copy into array
+    void* slotptr = scl->data + (slot * scl->elt_size);
+    memcpy(slotptr, item, scl->elt_size);
+
+    return SAECLIB_ERROR_NOERROR;
 }
 
 
-saeclib_error_e saeclib_collection_iterator_init(const saeclib_collection_t* collection,
-                                                 saeclib_collection_iterator_t* it)
+/**
+ * Slow find first set function.
+ * Should be replaced by __builtin_ffsl later on.
+ */
+static int my_u32_ffs(uint32_t bits)
 {
-    return SAECLIB_ERROR_UNIMPLEMENTED;
+    if (bits == 0) {
+        return 0;
+    }
+
+    int i;
+    for (i = 0; i < 32; i++) {
+        if (bits & 0x1) {
+            break;
+        }
+        bits >>= 1;
+    }
+    return i;
 }
 
 
-saeclib_error_e saeclib_collection_iterator_next(const saeclib_collection_t* collection,
+saeclib_error_e saeclib_collection_iterator_init(const saeclib_collection_t* scl,
                                                  saeclib_collection_iterator_t* it)
 {
+    // find first element to point iterator at.
+    const uint32_t num_bitmask_words = ((scl->capacity - 1) / 32) + 1;
+
+    int bitmask_idx;
+    for (bitmask_idx = 0; bitmask_idx < num_bitmask_words; bitmask_idx++) {
+        if (scl->occupied_bitmap[bitmask_idx]) {
+            break;
+        }
+    }
+    if (bitmask_idx == num_bitmask_words) {
+        return SAECLIB_ERROR_OVERFLOW;
+    }
+
+    //it->idx = __builtin_ffsl(scl->occupied_bitmask[bitmask_idx]) + ;
+    it->idx = my_u32_ffs(scl->occupied_bitmap[bitmask_idx]) + (num_bitmask_words * 32);
+
+    return SAECLIB_ERROR_NOERROR;
+}
+
+
+saeclib_error_e saeclib_collection_iterator_next(const saeclib_collection_t* scl,
+                                                 saeclib_collection_iterator_t* it)
+{
+    it->idx++;
+    uint32_t maskout = ~(((uint32_t)1) << (it->idx % 32)) - 1;
+
+    if (scl->occupied_bitmap[it->idx / 32] & maskout) {
+
+    }
+
+
+
     return SAECLIB_ERROR_UNIMPLEMENTED;
 }
 
@@ -63,8 +185,22 @@ saeclib_error_e saeclib_collection_iterator_get_volatile(const saeclib_collectio
 }
 
 
-saeclib_error_e saeclib_collection_remove_item(const saeclib_collection_t* collection,
-                                               saeclib_collection_iterator_t* it)
+saeclib_error_e saeclib_collection_remove_item(saeclib_collection_t* scl,
+                                               const saeclib_collection_iterator_t* it)
 {
-    return SAECLIB_ERROR_UNIMPLEMENTED;
+    // remove a slot from the queue
+    uint32_t slot = it->idx;
+    saeclib_error_e queue_err = saeclib_circular_buffer_pushone(scl->slots, &slot);
+
+    if (queue_err != SAECLIB_ERROR_NOERROR) {
+        return SAECLIB_ERROR_UNKNOWN;
+    }
+
+    // enforce internal bitmask invariant
+    if (!get_occupied_bit(scl, slot)) {
+        return SAECLIB_ERROR_UNKNOWN;
+    }
+    clear_occupied_bit(scl, slot);
+
+    return SAECLIB_ERROR_NOERROR;
 }

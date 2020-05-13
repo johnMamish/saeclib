@@ -83,7 +83,7 @@ void saeclib_collection_init_test()
     saeclib_collection_t scl;
     static uint8_t bufspace[sizeof(my_struct_t) * NUMEL];
     static uint32_t bitmap[NUMEL / 32 + 1];
-    saeclib_circular_buffer_t slots = saeclib_circular_buffer_salloc(NUMEL, sizeof(uint32_t));
+    saeclib_circular_buffer_t slots = saeclib_circular_buffer_salloc(NUMEL + 1, sizeof(uint32_t));
 
     saeclib_error_e err = saeclib_collection_init(&scl,
                                                   bufspace,

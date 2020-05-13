@@ -89,7 +89,8 @@ saeclib_error_e saeclib_collection_init(saeclib_collection_t* collection,
 
 #define saeclib_collection_salloc(capacity, elt_size) \
     ({ \
-    saeclib_circular_buffer_t scb = saeclib_circular_buffer_salloc((capacity + 1), sizeof(uint32_t)); \
+    static saeclib_circular_buffer_t scb; \
+    scb = saeclib_circular_buffer_salloc((capacity + 1), sizeof(uint32_t)); \
     static uint32_t bitmap_space[(capacity / 32) + 1]; \
     saeclib_collection_t scl; \
     static uint8_t space[(capacity) * (elt_size)]; \
@@ -128,7 +129,9 @@ saeclib_error_e saeclib_collection_add(saeclib_collection_t* collection,
  * @param[in,out] collection  Collection that the iterator will iterate over.
  * @param[out]    it          Iterator structure to initialize.
  *
- * @return Returns SAECLIB_ERROR_NOERROR unless a null pointer or malformed structure is provided.
+ * @return Returns SAECLIB_ERROR_OVERFLOW if the collection is empty.
+ *         Otherwise, returns SAECLIB_ERROR_NOERROR unless a null pointer or malformed structure
+ *         is provided.
  */
 saeclib_error_e saeclib_collection_iterator_init(const saeclib_collection_t* collection,
                                                  saeclib_collection_iterator_t* it);
@@ -175,7 +178,7 @@ saeclib_error_e saeclib_collection_iterator_get_volatile(const saeclib_collectio
 /**
  * Removes an item in the collection referred to by a given iterator.
  */
-saeclib_error_e saeclib_collection_remove_item(const saeclib_collection_t* collection,
-                                               saeclib_collection_iterator_t* it);
+saeclib_error_e saeclib_collection_remove_item(saeclib_collection_t* collection,
+                                               const saeclib_collection_iterator_t* it);
 
 #endif
