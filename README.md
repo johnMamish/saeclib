@@ -6,7 +6,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 This library contains a few, very basic C containers that can be used in embedded systems where dynamic allocation is undesirable.
 
-This library is aimed at higher performance cortex-m microcontorllers, or even cortex-a microcontrollers if they're running an RTOS. saeclib tries to avoid anything too performant, but might slip in an unnecessary divide here and there. Don't use this in safety critical or medical grade code.
+This library is aimed at higher performance cortex-m microcontorllers, or even cortex-a microcontrollers if they're running an RTOS. saeclib tries to avoid anything too performant, but might slip in an unnecessary divide here and there; it assumes that multiplies are cheap. Don't use this in safety critical or medical grade code.
 
 Every data structure comes in 3 basic flavors:
   - one that holds memory blocks of arbitrary size, but returns pointers to those memory blocks, not values.   (container names have no prefix, for instance `saeclib_circular_buffer_t`).
