@@ -116,10 +116,20 @@ saeclib_error_e saeclib_circular_buffer_peekone(const saeclib_circular_buffer_t*
 }
 
 
+// TODO: remove loop for performance
 saeclib_error_e saeclib_circular_buffer_peekmany(const saeclib_circular_buffer_t* buf,
                                                  void* item,
                                                  uint32_t numel)
 {
+    int idx = buf->tail;
+    int cnt = 0;
+    while ((idx != buf->head) && (cnt < numel)) {
+        void* tailptr = buf->data + (idx * buf->elt_size);
+        memcpy((uint8_t*)item + (cnt * buf->elt_size), tailptr, buf->elt_size);
+        idx = ((idx + 1) > buf->capacity) ? (0) : (idx + 1);
+        cnt++;
+    }
+
     return SAECLIB_ERROR_UNIMPLEMENTED;
 }
 
