@@ -21,8 +21,9 @@ typedef struct saeclib_collection
     size_t capacity;
     size_t elt_size;
 
-    // This queue is used for keeping track of open slots.
-    saeclib_circular_buffer_t slots;
+    // This queue is used for keeping track of open slots. It contains uint32_t that are index
+    // numbers
+    saeclib_circular_buffer_t* slots;
 
     // This bitmap is a fast way to determine which slots are occupied when iterating.
     // The LSbit of each word corresponds to lower slot numbers
@@ -43,7 +44,23 @@ typedef struct saeclib_collection_iterator
  * @param[in,out] collection  Collection to be initialized with the given statically allocated space
  * @param[in]     bufspace    Pointer to a statically allocated memory region containing enough
  *                            memory to satisfy the collection's items: bufsize * eltsize bytes.
- * @param[in]
+ * @param[in]     bufsize     Size of bufspace in bytes. sizeof(bufspace) should be passed in.
+ * @param[in]     eltsize     Size of elements to be stored in the buffer. If you give this
+ *                            function a chunk of memory that's not a multiple of elt_size, it
+ *                            won't complain, but memory will be wasted.
+ * @param[in]     slots       Statically allocated circular buffer to be used by the saeclib
+ *                            collection. This buffer should be initialized with element size
+ *                            sizeof(uint32_t) and enough space to hold bufsize / eltsize items, its
+ *                            capacity should be initialized to the collection's capacity + 1.
+ * @param[in]     bitmap_space   Should point to a statically allocated array of uint32 to be used
+ *                               by the saeclib collection. It should have one bit for each element
+ *                               in the collection (this can be calculated by taking
+ *                               (capacity / 32) + 1
+ *
+ * @return If null pointers are provided, this function returns SAECLIB_ERROR_NULL_POINTER.
+ *         If the 'slots' circular buffer isn't initialized correctly, this function returns
+ *         SAECLIB_ERROR_BAD_STRUCTURE.
+ *         Otherwise, SAECLIB_ERROR_NOERROR is returned.
  */
 saeclib_error_e saeclib_collection_init(saeclib_collection_t* collection,
                                         void* bufspace,
@@ -52,9 +69,27 @@ saeclib_error_e saeclib_collection_init(saeclib_collection_t* collection,
                                         saeclib_circular_buffer_t* slots,
                                         uint32_t* bitmap_space);
 
+/**
+ * As with all salloc macros in saeclib, use with caution. Containers initialized with a salloc
+ * macro must not be passed out of a function that's called more than once.
+ *
+ * Statically allocates an appropriate amount of memory and initializes structures appropriately in
+ * an inner scope and then calls saeclib_collection_init on it.
+ *
+ * @param[in]     capacity    How many elements should the collection be able to hold?
+ * @param[in]     elt_size    What's the size of each element, in bytes?
+ *
+ * @return This macro passes out a saeclib_collection_t.
+ *
+ * Example usage:
+ *
+ *     // create a collection that can hold 16 mystruct_t's.
+ *     saeclib_collection_t scl = saeclib_collection_salloc(16, sizeof(mystruct_t));
+ */
+
 #define saeclib_collection_salloc(capacity, elt_size) \
     ({ \
-    saeclib_circular_buffer_t scb = saeclib_circular_buffer_salloc((capacity), sizeof(void*)); \
+    saeclib_circular_buffer_t scb = saeclib_circular_buffer_salloc((capacity + 1), sizeof(uint32_t)); \
     static uint32_t bitmap_space[(capacity / 32) + 1]; \
     saeclib_collection_t scl; \
     static uint8_t space[(capacity) * (elt_size)]; \
