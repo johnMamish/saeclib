@@ -110,23 +110,11 @@ saeclib_error_e saeclib_collection_add(saeclib_collection_t* scl,
 
 
 /**
- * Slow find first set function.
- * Should be replaced by __builtin_ffsl later on.
+ * returns -1 if 'bits' is all 0's. Otherwise, returns position of first set bit.
  */
 static int my_u32_ffs(uint32_t bits)
 {
-    if (bits == 0) {
-        return 0;
-    }
-
-    int i;
-    for (i = 0; i < 32; i++) {
-        if (bits & 0x1) {
-            break;
-        }
-        bits >>= 1;
-    }
-    return i;
+    return __builtin_ffsl(bits) - 1;
 }
 
 
@@ -146,7 +134,6 @@ saeclib_error_e saeclib_collection_iterator_init(const saeclib_collection_t* scl
         return SAECLIB_ERROR_OVERFLOW;
     }
 
-    //it->idx = __builtin_ffsl(scl->occupied_bitmask[bitmask_idx]) + ;
     it->idx = my_u32_ffs(scl->occupied_bitmap[bitmask_idx]) + (bitmask_idx * 32);
 
     return SAECLIB_ERROR_NOERROR;
