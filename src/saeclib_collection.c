@@ -6,7 +6,7 @@
 /**
  * Maybe this function should return an error in case of out-of-bounds.
  */
-static bool get_occupied_bit(saeclib_collection_t* collection, uint32_t slot)
+static bool get_occupied_bit(const saeclib_collection_t* collection, uint32_t slot)
 {
     uint32_t bitmap_idx = slot / 32;
     uint32_t bitmap_bitpos = slot % 32;
@@ -147,25 +147,30 @@ saeclib_error_e saeclib_collection_iterator_init(const saeclib_collection_t* scl
     }
 
     //it->idx = __builtin_ffsl(scl->occupied_bitmask[bitmask_idx]) + ;
-    it->idx = my_u32_ffs(scl->occupied_bitmap[bitmask_idx]) + (num_bitmask_words * 32);
+    it->idx = my_u32_ffs(scl->occupied_bitmap[bitmask_idx]) + (bitmask_idx * 32);
 
     return SAECLIB_ERROR_NOERROR;
 }
 
 
+/**
+ * TODO: make faster
+ */
 saeclib_error_e saeclib_collection_iterator_next(const saeclib_collection_t* scl,
                                                  saeclib_collection_iterator_t* it)
 {
+    //uint32_t maskout = ~(((uint32_t)1) << (it->idx % 32)) - 1;
+
     it->idx++;
-    uint32_t maskout = ~(((uint32_t)1) << (it->idx % 32)) - 1;
-
-    if (scl->occupied_bitmap[it->idx / 32] & maskout) {
-
+    while ((it->idx < scl->capacity) && (!get_occupied_bit(scl, it->idx))) {
+        it->idx++;
     }
 
-
-
-    return SAECLIB_ERROR_UNIMPLEMENTED;
+    if (it->idx > scl->capacity) {
+        return SAECLIB_ERROR_OVERFLOW;
+    } else {
+        return SAECLIB_ERROR_NOERROR;
+    }
 }
 
 
@@ -173,7 +178,10 @@ saeclib_error_e saeclib_collection_iterator_get(const saeclib_collection_t* coll
                                                 const saeclib_collection_iterator_t* it,
                                                 void* item)
 {
-    return SAECLIB_ERROR_UNIMPLEMENTED;
+    void* slotptr = collection->data + (it->idx * collection->elt_size);
+    memcpy(item, slotptr, collection->elt_size);
+
+    return SAECLIB_ERROR_NOERROR;
 }
 
 
