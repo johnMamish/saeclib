@@ -8,6 +8,7 @@ SRC_DIR = ../src
 # List of all library sources that might need to be compiled into test executables
 C_SOURCES:=
 C_SOURCES+=$(SRC_DIR)/saeclib_circular_buffer.c
+C_SOURCES+=$(SRC_DIR)/saeclib_collection.c
 C_SOURCES+=./unity.c
 
 # build directory for library .o files
