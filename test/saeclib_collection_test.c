@@ -311,7 +311,7 @@ void saeclib_collection_remove_test()
             saeclib_collection_remove_item(&scl, &scit);
             checklist[item] = 0;
         }
-    } while (saeclib_collection_iterator_next(&scl, &scit) != SAECLIB_ERROR_UNDERFLOW);
+    } while (saeclib_collection_iterator_next(&scl, &scit) == SAECLIB_ERROR_NOERROR);
 
     saeclib_collection_iterator_init(&scl, &scit);
     do {
@@ -320,7 +320,7 @@ void saeclib_collection_remove_test()
 
         TEST_ASSERT_EQUAL_INT(1, checklist[item]);
         checklist[item] = 0;
-    } while (saeclib_collection_iterator_next(&scl, &scit) != SAECLIB_ERROR_UNDERFLOW);
+    } while (saeclib_collection_iterator_next(&scl, &scit) == SAECLIB_ERROR_NOERROR);
 
     for (int i = 0; i < ELTS_TO_ADD; i++) {
         TEST_ASSERT_EQUAL_INT(0, checklist[i]);
@@ -423,7 +423,7 @@ void saeclib_collection_iterator_bitpattern_test_1()
         if (!list_contains_u32(item, things_to_not_remove, NUMEL_TO_NOT_REMOVE)) {
             saeclib_collection_remove_item(&scl, &scit);
         }
-    } while (saeclib_collection_iterator_next(&scl, &scit) != SAECLIB_ERROR_OVERFLOW);
+    } while (saeclib_collection_iterator_next(&scl, &scit) == SAECLIB_ERROR_NOERROR);
 
     uint32_t checklist[NUMEL] = { 0 };
     saeclib_collection_iterator_init(&scl, &scit);
@@ -434,7 +434,7 @@ void saeclib_collection_iterator_bitpattern_test_1()
             TEST_FAIL_MESSAGE("collection contains item that should have been removed");
         }
         checklist[item] = 1;
-    } while (saeclib_collection_iterator_next(&scl, &scit) != SAECLIB_ERROR_OVERFLOW);
+    } while (saeclib_collection_iterator_next(&scl, &scit) == SAECLIB_ERROR_NOERROR);
 
     for (int i = 0; i < NUMEL_TO_NOT_REMOVE; i++) {
         if (checklist[things_to_not_remove[i]] == 0) {
@@ -479,7 +479,7 @@ void saeclib_collection_iterator_bitpattern_test_2()
         if (!list_contains_u32(item, things_to_not_remove, NUMEL_TO_NOT_REMOVE)) {
             saeclib_collection_remove_item(&scl, &scit);
         }
-    } while (saeclib_collection_iterator_next(&scl, &scit) != SAECLIB_ERROR_OVERFLOW);
+    } while (saeclib_collection_iterator_next(&scl, &scit) == SAECLIB_ERROR_NOERROR);
 
     uint32_t checklist[NUMEL] = { 0 };
     saeclib_collection_iterator_init(&scl, &scit);
@@ -490,7 +490,7 @@ void saeclib_collection_iterator_bitpattern_test_2()
             TEST_FAIL_MESSAGE("collection contains item that should have been removed");
         }
         checklist[item] = 1;
-    } while (saeclib_collection_iterator_next(&scl, &scit) != SAECLIB_ERROR_OVERFLOW);
+    } while (saeclib_collection_iterator_next(&scl, &scit) == SAECLIB_ERROR_NOERROR);
 
     for (int i = 0; i < NUMEL_TO_NOT_REMOVE; i++) {
         if (checklist[things_to_not_remove[i]] == 0) {
