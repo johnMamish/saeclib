@@ -27,7 +27,7 @@ typedef struct saeclib_static_array
 #define saeclib_static_array_salloc(capacity, eltsize) \
     ({\
     saeclib_static_array_t ssa; \
-    static uint8_t space[(capacity) * (elt_size)]; \
+    static uint8_t space[(capacity) * (eltsize)]; \
     ssa.data = space; \
     ssa.capacity = capacity; \
     ssa.size = 0; \
