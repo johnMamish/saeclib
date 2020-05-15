@@ -1,6 +1,8 @@
 #ifndef _SAECLIB_STATIC_ARRAY_H
 #define _SAECLIB_STATIC_ARRAY_H
 
+#include <stddef.h>
+
 /**
  * Container for a resizable array with a fixed maximum capacity.
  *
