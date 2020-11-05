@@ -141,13 +141,11 @@ saeclib_error_e saeclib_collection_iterator_init(const saeclib_collection_t* scl
 
 
 /**
- * TODO: make faster
+ * TODO: This function could be made faster by skipping words that are all 0.
  */
 saeclib_error_e saeclib_collection_iterator_next(const saeclib_collection_t* scl,
                                                  saeclib_collection_iterator_t* it)
 {
-    //uint32_t maskout = ~(((uint32_t)1) << (it->idx % 32)) - 1;
-
     it->idx++;
     while ((it->idx < scl->capacity) && (!get_occupied_bit(scl, it->idx))) {
         it->idx++;
