@@ -129,7 +129,7 @@ saeclib_error_e saeclib_collection_add(saeclib_collection_t* collection,
  * @param[in,out] collection  Collection that the iterator will iterate over.
  * @param[out]    it          Iterator structure to initialize.
  *
- * @return Returns SAECLIB_ERROR_OVERFLOW if the collection is empty.
+ * @return Returns SAECLIB_ERROR_UNDERFLOW if the collection is empty.
  *         Otherwise, returns SAECLIB_ERROR_NOERROR unless a null pointer or malformed structure
  *         is provided.
  */

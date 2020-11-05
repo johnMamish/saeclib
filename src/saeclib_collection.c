@@ -131,7 +131,7 @@ saeclib_error_e saeclib_collection_iterator_init(const saeclib_collection_t* scl
         }
     }
     if (bitmask_idx == num_bitmask_words) {
-        return SAECLIB_ERROR_OVERFLOW;
+        return SAECLIB_ERROR_UNDERFLOW;
     }
 
     it->idx = my_u32_ffs(scl->occupied_bitmap[bitmask_idx]) + (bitmask_idx * 32);
