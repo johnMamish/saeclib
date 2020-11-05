@@ -497,6 +497,7 @@ void saeclib_collection_iterator_bitpattern_test_2()
             TEST_FAIL_MESSAGE("collection did not contain item that still should have been there");
         }
     }
+#undef NUMEL
 }
 
 
