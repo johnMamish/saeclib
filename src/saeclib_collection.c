@@ -152,7 +152,7 @@ saeclib_error_e saeclib_collection_iterator_next(const saeclib_collection_t* scl
     }
 
     if (it->idx >= scl->capacity) {
-        return SAECLIB_ERROR_OVERFLOW;
+        return SAECLIB_ERROR_UNDERFLOW;
     } else {
         return SAECLIB_ERROR_NOERROR;
     }
