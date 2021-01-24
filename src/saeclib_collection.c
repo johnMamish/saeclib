@@ -2,6 +2,32 @@
 
 #include <string.h>
 
+/**
+ * saeclib_collection_t is a statically allocated, unordered container designed for fast insertion
+ * and deletion.
+ *
+ * saeclib_collection_t allows for static allocation whereas a linked list does not.
+ *
+ * Also, saeclib_collection_t allows for O(1) insertion and deletion whereas a static array does
+ * not
+ *
+ *
+ * saeclib_collection_t consists of a fixed-size static array and a queue of unused and used
+ * indexes.
+ *
+ * To insert an item, an index is moved from the 'unused' to 'used' queue; the item is placed in
+ * the corresponding slot in the array.
+ *
+ * To remove an item, the item's index is move back from the 'used' to the 'unused queue'.
+ *
+ * Because saeclib_collection_t is unordered, an iterator needs to be used to refer to items
+ * that are to be deleted. While in practice each item does have an index number, this should be
+ * opaque to the user, hence an iterator is required.
+ *
+ * The 'used queue' is present to keep track of which slots to iterate over. In practice, we use
+ * a bitmap instead of a queue to save memory.
+ */
+
 
 /**
  * Maybe this function should return an error in case of out-of-bounds.

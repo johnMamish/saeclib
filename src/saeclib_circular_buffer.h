@@ -223,10 +223,4 @@ saeclib_error_e saeclib_u8_circular_buffer_disposeone(saeclib_u8_circular_buffer
 saeclib_error_e saeclib_u8_circular_buffer_disposemany(saeclib_u8_circular_buffer_t* buf,
                                                        uint32_t numel);
 
-
-struct saeclib_vp_circular_buffer
-{
-    void** data;
-} saeclib_vp_circular_buffer_t;
-
 #endif

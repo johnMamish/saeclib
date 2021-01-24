@@ -26,7 +26,8 @@ typedef struct saeclib_collection
     saeclib_circular_buffer_t* slots;
 
     // This bitmap is a fast way to determine which slots are occupied when iterating.
-    // The LSbit of each word corresponds to lower slot numbers
+    // The LSbit of each word corresponds to lower slot numbers.
+    // A queue of "used indexes" would also have worked, but would take 32x the amount of memory.
     uint32_t* occupied_bitmap;
 } saeclib_collection_t;
 
