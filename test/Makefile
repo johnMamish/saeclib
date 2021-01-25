@@ -9,6 +9,7 @@ SRC_DIR = ../src
 C_SOURCES:=
 C_SOURCES+=$(SRC_DIR)/saeclib_circular_buffer.c
 C_SOURCES+=$(SRC_DIR)/saeclib_collection.c
+C_SOURCES+=$(SRC_DIR)/saeclib_hash.c
 C_SOURCES+=./unity.c
 
 # build directory for library .o files
@@ -19,6 +20,7 @@ TEST_SOURCES:=
 TEST_SOURCES+=saeclib_circular_buffer_test.c
 TEST_SOURCES+=saeclib_u8_circular_buffer_test.c
 TEST_SOURCES+=saeclib_collection_test.c
+TEST_SOURCES+=saeclib_hash_test.c
 
 # build directory for executables that run tests
 BUILD_TEST_DIR = build_test
@@ -36,8 +38,11 @@ SOURCE_OBJECTS = $(addprefix $(BUILD_SRC_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
 # directory
 TESTS = $(addprefix $(BUILD_TEST_DIR)/,$(basename $(TEST_SOURCES)))
 
-all: $(TESTS) $(SOURCE_OBJECTS)
+all: $(TESTS) $(SOURCE_OBJECTS) standalone_hash_fuzz
 	@for test in $(TESTS) ; do $$test || true; echo; echo ; done
+
+standalone_hash_fuzz: $(C_SOURCES) standalone_hash_fuzz.c Makefile | $(BUILD_SRC_DIR)
+	@$(CC) $(CFLAGS) $(SRC_DIR)/saeclib_hash.c ./standalone_hash_fuzz.c -o $@
 
 $(BUILD_SRC_DIR)/%.o: $(SRC_DIR)/%.c Makefile | $(BUILD_SRC_DIR)
 	@$(CC) -c $(CFLAGS) $< -o $@
