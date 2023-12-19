@@ -101,6 +101,37 @@ void saeclib_u8_circular_buffer_push_pop_count_test()
 }
 
 /**
+ * Test to see if bulk adding things to the circular buffer increases the size.
+ */
+void saeclib_u8_circular_buffer_pushpopmany_count_test()
+{
+#define NUMEL 10
+
+    saeclib_u8_circular_buffer_t scb = saeclib_u8_circular_buffer_salloc(NUMEL);
+    uint8_t ones[5] = { 1, 1, 1, 1, 1 };
+
+    saeclib_error_e err = saeclib_u8_circular_buffer_pushmany(&scb, ones, sizeof(ones));
+    TEST_ASSERT_EQUAL_INT(SAECLIB_ERROR_NOERROR, err);
+    TEST_ASSERT_EQUAL_INT(5, saeclib_u8_circular_buffer_size(&scb));
+
+    // should copy data rather than pointing to the original
+    for (size_t i = 0; i < 5; i++) {
+        ones[i] = 2;
+    }
+
+    uint8_t out[NUMEL] = { 0 };
+    err = saeclib_u8_circular_buffer_popmany(&scb, out, 5);
+    TEST_ASSERT_EQUAL_INT(SAECLIB_ERROR_NOERROR, err);
+    TEST_ASSERT_EQUAL_INT(0, saeclib_u8_circular_buffer_size(&scb));
+    for (size_t j = 0; j < 5; j++) {
+        TEST_ASSERT_EQUAL_INT(1, out[j]); // not 2
+    }
+
+#undef NUMEL
+}
+
+
+/**
  * Check to see if the empty function correctly determines when the buffer is empty.
  */
 void saeclib_u8_circular_buffer_empty_test()
@@ -200,6 +231,47 @@ void saeclib_u8_circular_buffer_overflow_test()
 #undef NUMEL
 }
 
+void saeclib_u8_circular_buffer_pushmany_overflow_test()
+{
+#define NUMEL 13
+
+    saeclib_u8_circular_buffer_t scb = saeclib_u8_circular_buffer_salloc(NUMEL);
+
+    uint8_t data[7] = { 0 };
+    saeclib_error_e err = saeclib_u8_circular_buffer_pushmany(&scb, data, 7);
+    TEST_ASSERT_EQUAL_INT(SAECLIB_ERROR_NOERROR, err);
+    TEST_ASSERT_EQUAL_INT(7, saeclib_u8_circular_buffer_size(&scb));
+
+    err = saeclib_u8_circular_buffer_pushmany(&scb, data, 7);
+    TEST_ASSERT_EQUAL_INT(SAECLIB_ERROR_OVERFLOW, err);
+    TEST_ASSERT_EQUAL_INT(7, saeclib_u8_circular_buffer_size(&scb)); // data should not have changed
+
+#undef NUMEL
+}
+
+void saeclib_u8_circular_buffer_popmany_underflow_test()
+{
+#define NUMEL 10
+
+    saeclib_u8_circular_buffer_t scb = saeclib_u8_circular_buffer_salloc(NUMEL);
+
+    uint8_t data[5] = { 1 };
+    saeclib_error_e err = saeclib_u8_circular_buffer_pushmany(&scb, data, 5);
+    TEST_ASSERT_EQUAL_INT(SAECLIB_ERROR_NOERROR, err);
+    TEST_ASSERT_EQUAL_INT(5, saeclib_u8_circular_buffer_size(&scb));
+
+    uint8_t out[5] = { 0 };
+    
+    err = saeclib_u8_circular_buffer_popmany(&scb, out, 5);
+    TEST_ASSERT_EQUAL_INT(SAECLIB_ERROR_NOERROR, err);
+    TEST_ASSERT_EQUAL_INT(0, saeclib_u8_circular_buffer_size(&scb));
+    
+    err = saeclib_u8_circular_buffer_popmany(&scb, out, 5);
+    TEST_ASSERT_EQUAL_INT(SAECLIB_ERROR_UNDERFLOW, err);
+    TEST_ASSERT_EQUAL_INT(0, saeclib_u8_circular_buffer_size(&scb));
+
+#undef NUMEL
+}
 
 int main(int argc, char** argv)
 {
@@ -208,9 +280,12 @@ int main(int argc, char** argv)
     RUN_TEST(saeclib_u8_circular_buffer_salloc_test);
     RUN_TEST(saeclib_u8_circular_buffer_push_count_test);
     RUN_TEST(saeclib_u8_circular_buffer_push_pop_count_test);
+    RUN_TEST(saeclib_u8_circular_buffer_pushpopmany_count_test);
     RUN_TEST(saeclib_u8_circular_buffer_empty_test);
     RUN_TEST(saeclib_u8_circular_buffer_queue_test);
     RUN_TEST(saeclib_u8_circular_buffer_pushone_popone_test);
     RUN_TEST(saeclib_u8_circular_buffer_overflow_test);
+    RUN_TEST(saeclib_u8_circular_buffer_pushmany_overflow_test);
+    RUN_TEST(saeclib_u8_circular_buffer_popmany_underflow_test);
     return UNITY_END();
 }
