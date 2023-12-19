@@ -213,6 +213,36 @@ void saeclib_u8_circular_buffer_pushone_popone_test()
 #undef NUMEL
 }
 
+void saeclib_u8_circular_buffer_pushpopmany_wrap_test()
+{
+#define NUMEL 13
+
+    saeclib_u8_circular_buffer_t scb = saeclib_u8_circular_buffer_salloc(NUMEL);
+
+    uint8_t in[7] = { 0, 1, 2, 3, 4, 5, 6 };
+    uint8_t out[7];
+
+    saeclib_error_e err;
+    // push and then pop 7 elements from the 13-capacity buffer 5 times. This should cause several
+    // wrap arounds
+    for (size_t i = 0; i < 5; i++) {
+        err = saeclib_u8_circular_buffer_pushmany(&scb, in, 7);
+        TEST_ASSERT_EQUAL_INT(SAECLIB_ERROR_NOERROR, err);
+        TEST_ASSERT_EQUAL_INT(7, saeclib_u8_circular_buffer_size(&scb));
+
+        err = saeclib_u8_circular_buffer_popmany(&scb, out, 7);
+        TEST_ASSERT_EQUAL_INT(SAECLIB_ERROR_NOERROR, err);
+        TEST_ASSERT_EQUAL_INT(0, saeclib_u8_circular_buffer_size(&scb));
+    }
+    
+    for (size_t j = 0; j < 7; j++) {
+        TEST_ASSERT_EQUAL_INT(j, out[j]);
+    }
+
+#undef NUMEL
+}
+
+
 void saeclib_u8_circular_buffer_overflow_test()
 {
 #define NUMEL 13
@@ -284,6 +314,7 @@ int main(int argc, char** argv)
     RUN_TEST(saeclib_u8_circular_buffer_empty_test);
     RUN_TEST(saeclib_u8_circular_buffer_queue_test);
     RUN_TEST(saeclib_u8_circular_buffer_pushone_popone_test);
+    RUN_TEST(saeclib_u8_circular_buffer_pushpopmany_wrap_test);
     RUN_TEST(saeclib_u8_circular_buffer_overflow_test);
     RUN_TEST(saeclib_u8_circular_buffer_pushmany_overflow_test);
     RUN_TEST(saeclib_u8_circular_buffer_popmany_underflow_test);

@@ -2,7 +2,6 @@
 
 #include <string.h>
 
-
 /**
  *
  */
@@ -227,7 +226,7 @@ saeclib_error_e saeclib_u8_circular_buffer_pushmany(saeclib_u8_circular_buffer_t
                                                     const uint8_t* items,
                                                     uint32_t numel)
 {
-    uint8_t* oldhead = buf->data + buf->head;
+    int oldhead = buf->head;
     saeclib_error_e err;
 
     if ((err = try_advance_head_u8(buf, numel)) != SAECLIB_ERROR_NOERROR) {
@@ -235,9 +234,9 @@ saeclib_error_e saeclib_u8_circular_buffer_pushmany(saeclib_u8_circular_buffer_t
     }
 
     // // copy until the end of the buffer (could be zero if no space at end)
-    size_t available_at_end = (buf->head >= buf->tail) ? buf->capacity - buf->head : buf->tail - buf->head;
+    size_t available_at_end = (oldhead >= buf->tail) ? buf->capacity - oldhead : buf->tail - oldhead;
     size_t first_copy_size = available_at_end >= numel ? numel : available_at_end;
-    memcpy(oldhead, items, first_copy_size);
+    memcpy(buf->data + oldhead, items, first_copy_size);
     // copy to the front of the buffer (could be zero if no space at front or all was copied on first step)
     memcpy(buf->data, items + first_copy_size, numel - first_copy_size);
 
@@ -294,12 +293,10 @@ saeclib_error_e saeclib_u8_circular_buffer_peekmany(const saeclib_u8_circular_bu
     if (saeclib_u8_circular_buffer_size(buf) < numel) {
         return SAECLIB_ERROR_UNDERFLOW;
     }
-    uint8_t* tailptr = buf->data + buf->tail;
-
     // copy until the end of the buffer (could be zero if no data at end)
     size_t available_at_end = (buf->tail >= buf->head) ? buf->capacity - buf->tail : buf->head - buf->tail;
     size_t first_copy_size = available_at_end >= numel ? numel : available_at_end;
-    memcpy(items, tailptr, first_copy_size);
+    memcpy(items, buf->data + buf->tail, first_copy_size);
     // copy from the front of the buffer (could be zero if no data at front or all was copied on first step)
     memcpy(items + first_copy_size, buf->data, numel - first_copy_size);
     return SAECLIB_ERROR_NOERROR;
