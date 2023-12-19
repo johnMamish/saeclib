@@ -1,2 +1,4 @@
 build
 build_test
+standalone_hash_fuzz*
+
